@@ -9,7 +9,7 @@ $(document).ready(function () {
     ticTacToe.init();
 });
 
-var xSelector, oSelector, playerSelector, player2Selector, confirmSelector;
+var xSelector, oSelector, playerSelector, player2Selector, confirmSelector, player, player2;
 
 var xImgUrl = "data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIE" +
     "dlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZ" +
@@ -107,8 +107,13 @@ var App = function () {
         xSelector.render();
         oSelector.render();
     };
-    this.render = function () {
-        this.renderAllSelectors();
+    this.renderGame = function () {
+        if (ticTacToe.aiActiveState == 0) {
+            $("#player2-score").html("Player2: " + ticTacToe.player2Score);
+        }
+        if (ticTacToe.aiActiveState == 1) {
+            $("#player2-score").html("AI: " + ticTacToe.player2Score);
+        }
     };
 
     this.playerStateHandler = function () {
@@ -164,8 +169,9 @@ var App = function () {
                     this.$selectorsContainer.css("display", "none");
                 }
             }
+            ticTacToe.playersInit();
+            this.renderGame();
         }.bind(this));
-        ticTacToe.aiInit();
     };
     this.resetAppHandler = function () {
         $("#reset").click(function () {
@@ -185,6 +191,7 @@ var App = function () {
     this.resetApp = function () {
         ticTacToe.resetGrid();
         ticTacToe.resetCellStates();
+        ticTacToe.resetGameStates();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
@@ -193,6 +200,9 @@ var App = function () {
 var app = new App();
 
 var Game = function () {
+
+    this.playerScore = 0;
+    this.player2Score = 0;
 
     //css settings to change x's and o's
     //0 is O, 1 is X, and 2 is blank
@@ -218,14 +228,28 @@ var Game = function () {
     //to check if player is playing against ai or another player
     this.aiActiveState = 0;
 
-    this.aiInit = function () {
+    this.playersInit = function () {
         if (player2Selector.state == 0) {
             this.aiActiveState = 1;
-            log(this.aiActiveState)
+            player2 = "";
+            player2 = new Player("ai");
+        } else if (player2Selector.state == 1) {
+            this.aiActiveState = 0;
+            player2 = "";
+            player2 = new Player("player2");
         }
+        if (xSelector.state == 1){
+            player.peg = "x";
+            player2.peg = "o";
+        }else if(oSelector.state == 1){
+            player.peg = "o";
+            player2.peg = "x";
+        }
+
     };
 
     this.init = function () {
+        player = new Player("player");
         this.initCells();
     };
 
@@ -244,10 +268,17 @@ var Game = function () {
         }
     };
     //resetting cell states for new game
-    this.resetCellStates = function(){
+    this.resetCellStates = function () {
         for (var i = 0; i < 9; i++) {
             this.$cells[i].state = 0;
         }
+    };
+
+    this.resetGameStates = function(){
+        this.playerScore = 0;
+        this.player2Score = 0;
+        this.currentPlayerState = 0;
+        this.aiActiveState = 0;
     };
 
 };
@@ -259,16 +290,37 @@ var Cell = function (id, scope) {
     //current value to change from x and o so later we can compare for who won
     this.currentValue = "";
 
+    this.pegHandler = function () {
+
+        var x = scope.cellCssSettings[1];
+        var o = scope.cellCssSettings[0];
+
+        if(ticTacToe.currentPlayerState == 1 && xSelector.state == 1){
+            return o;
+        }else if(ticTacToe.currentPlayerState == 1 && oSelector.state == 1){
+            return x;
+        }else if(ticTacToe.currentPlayerState == 0 && xSelector.state == 1){
+            return x;
+        }else if(ticTacToe.currentPlayerState == 0 && oSelector.state == 1){
+            return o;
+        }
+    };
     this.clickHandler = function () {
         var self = this;
         this.$id.click(function () {
             if (self.state == 0) {
-                $(this).css(scope.cellCssSettings[scope.currentPlayerState]);
+                $(this).css(self.pegHandler());
                 self.state = 1;
-                log(self.$id + " state: " + self.state);
+                self.currentValueHandler();
                 self.playerChangeHandler();
             }
+
         });
+    };
+    this.currentValueHandler = function () {
+        if (scope.currentPlayerState == 0) {
+            this.currentValue = "o";
+        } else this.currentValue = "x";
     };
 
     this.playerChangeHandler = function () {
@@ -278,6 +330,11 @@ var Cell = function (id, scope) {
             scope.currentPlayerState = 0;
         }
     };
+};
+
+var Player = function (type) {
+    this.peg = "";
+    this.type = type;
 };
 
 
