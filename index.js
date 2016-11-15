@@ -85,33 +85,12 @@ var App = function () {
             margin: "0 10px"
         }
     ];
-    this.cellCssSettings = [{
-        "background": 'url(' + oImgUrl + ') center no-repeat',
-        "background-size": '70%'
-    },{
-        "background": 'url(' + xImgUrl + ') center no-repeat',
-        "background-size": '70%'
-    },{
-        "background": 'rgba(0,0,0,0) center no-repeat',
-        "background-size": '70%'
-    }];
+
 
     //array is later filled with jquery selector objects
-    this.$cells = [];
-
-    this.cellClickBinder = function () {
-        var self = this;
-        for (var i = 0; i < 9; i++) {
-            this.$cells.push($("#cell-" + i));
-            this.$cells[i].click(function () {
-                $(this).css(self.cellCssSettings[xSelector.state]);
-            });
-        }
-    };
 
     this.initGame = function () {
         this.$selectorsContainer = $("#selectors-container");
-        this.cellClickBinder();
         this.resetAppHandler();
     };
     this.initSelectors = function () {
@@ -192,11 +171,7 @@ var App = function () {
         }.bind(this));
     };
 
-    this.resetGrid = function(){
-        for (var i = 0; i < this.$cells.length; i++) {
-            this.$cells[i].css(this.cellCssSettings[2]);
-        }
-    };
+
     this.resetSelectorStates = function () {
         confirmSelector.state = 0;
         xSelector.state = 0;
@@ -205,7 +180,7 @@ var App = function () {
         player2Selector.state = 0;
     };
     this.resetApp = function () {
-        this.resetGrid();
+        ticTacToe.resetGrid();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
@@ -213,11 +188,77 @@ var App = function () {
 
 var app = new App();
 
-var Game = function(){
+var Game = function () {
 
-    this.init = function(){
+    //css settings to change x's and o's
+    //0 is O, 1 is X, and 2 is blank
+    this.cellCssSettings = [
+        {
+            "background": 'url(' + oImgUrl + ') center no-repeat',
+            "background-size": '70%'
+        }, {
+            "background": 'url(' + xImgUrl + ') center no-repeat',
+            "background-size": '70%'
+        }, {
+            "background": 'rgba(0,0,0,0) center no-repeat',
+            "background-size": '70%'
+        }
+    ];
+
+    this.$cells = [];
+
+
+    //current active player, 0 is player 1 and 1 is player 2 or ai
+    this.currentPlayerState = 0;
+
+    //to check if player is playing against ai or another player
+    this.aiActiveState = 0;
+
+    this.init = function () {
+        this.initCells();
+    };
+
+    this.initCells = function () {
+        var self = this;
+        for (var i = 0; i < 9; i++) {
+            this.$cells.push(new Cell(i, self));
+            this.$cells[i].clickHandler();
+        }
+    };
+
+    //reset the whole grid to blank
+    this.resetGrid = function () {
+        for (var i = 0; i < this.$cells.length; i++) {
+            this.$cells[i].$id.css(this.cellCssSettings[2]);
+        }
     };
 
 };
+
+var Cell = function (id, scope) {
+
+    this.state = 0;
+    this.$id = $("#cell-" + id);
+
+    this.clickHandler = function(){
+        var self = this;
+        this.$id.click(function(){
+            $(this).css(scope.cellCssSettings[scope.currentPlayerState]);
+            self.state = 1;
+            log(self.$id + " state: " + self.state);
+            self.playerChangeHandler();
+        });
+    };
+
+    this.playerChangeHandler = function(){
+        if (scope.currentPlayerState == 0){
+            scope.currentPlayerState = 1;
+        }else if (scope.currentPlayerState == 1){
+            scope.currentPlayerState = 0;
+        }
+    };
+};
+
+
 
 var ticTacToe = new Game();
