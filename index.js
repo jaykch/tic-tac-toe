@@ -5,6 +5,7 @@ $(document).ready(function () {
 
     ticTacToe.initSelectors();
     ticTacToe.selectorStatesHandler();
+    ticTacToe.initGame();
 });
 
 var xSelector, oSelector, playerSelector, player2Selector, confirmSelector;
@@ -37,6 +38,7 @@ var oImgUrl = "data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZG
 function log() {
     console.log(arguments);
 }
+
 
 var selector = function (id, type, subType, cssSettings) {
     this.$id = $(id);
@@ -71,7 +73,6 @@ var selector = function (id, type, subType, cssSettings) {
 };
 
 var app = function () {
-
     this.selectorTypes = ["peg", "player", "confirm"];
     this.selectorSubTypes = ["x", "o", "player", "player2", "confirm"];
     this.selectorCssSettings = [
@@ -83,6 +84,20 @@ var app = function () {
             margin: "0 10px"
         }
     ];
+
+    this.cellClickBinder = function () {
+        for (var i = 1; i < 10; i++) {
+            $("#cell-" + i).click(function () {
+                $(this).css("background-image", 'url(' + xImgUrl + ')');
+            });
+        }
+    };
+
+    this.initGame = function () {
+        this.$selectorsContainer = $("#selectors-container");
+        this.cellClickBinder();
+        this.resetAppHandler();
+    };
     this.initSelectors = function () {
         xSelector = new selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
         oSelector = new selector("#o-selector", this.selectorTypes[0], this.selectorSubTypes[1], this.selectorCssSettings);
@@ -90,12 +105,15 @@ var app = function () {
         player2Selector = new selector("#player2-selector", this.selectorTypes[1], this.selectorSubTypes[3], this.selectorCssSettings);
         confirmSelector = new selector("#confirm", this.selectorTypes[2], this.selectorSubTypes[4]);
     };
+
     this.renderAllSelectors = function () {
         playerSelector.render();
         player2Selector.render();
         xSelector.render();
         oSelector.render();
     };
+
+
     this.playerStateHandler = function () {
         if (playerSelector.state == 1) {
             player2Selector.state = 0;
@@ -128,21 +146,6 @@ var app = function () {
         }
         this.renderAllSelectors();
     };
-    this.confirmHandler = function(){
-        confirmSelector.$id.click(function(){
-            if (confirmSelector.state == 1){
-                if(playerSelector.state == 0 && player2Selector.state ==0){
-                    alert("Please select if you want to play against a computer or a friend");
-                    confirmSelector.state = 0;
-                }else if(xSelector.state == 0 && oSelector.state ==0){
-                    alert("Please select if Player 1 is X or O");
-                    confirmSelector.state = 0;
-                }else{
-                    $("#selectors-container").css("display", "none");
-                }
-            }
-        }.bind(this));
-    };
     this.selectorStatesHandler = function () {
         playerSelector.$id.click(function () {
             this.playerStateHandler();
@@ -159,9 +162,39 @@ var app = function () {
 
         this.confirmHandler();
     };
+    this.confirmHandler = function () {
+        confirmSelector.$id.click(function () {
+            if (confirmSelector.state == 1) {
+                if (playerSelector.state == 0 && player2Selector.state == 0) {
+                    alert("Please select if you want to play against a computer or a friend");
+                    confirmSelector.state = 0;
+                } else if (xSelector.state == 0 && oSelector.state == 0) {
+                    alert("Please select if Player 1 is X or O");
+                    confirmSelector.state = 0;
+                } else {
+                    this.$selectorsContainer.css("display", "none");
+                }
+            }
+        }.bind(this));
+    };
+    this.resetAppHandler = function () {
+        $("#reset").click(function () {
+            this.resetApp();
+            this.$selectorsContainer.css("display", "block");
+        }.bind(this));
+    };
+
+    this.resetSelectorStates = function () {
+        confirmSelector.state = 0;
+        xSelector.state = 0;
+        oSelector.state = 0;
+        playerSelector.state = 0;
+        player2Selector.state = 0;
+    };
+    this.resetApp = function () {
+        this.resetSelectorStates();
+        this.renderAllSelectors();
+    };
 };
 
 var ticTacToe = new app();
-
-
-
