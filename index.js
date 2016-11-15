@@ -107,7 +107,9 @@ var App = function () {
         xSelector.render();
         oSelector.render();
     };
-
+    this.render = function () {
+        this.renderAllSelectors();
+    };
 
     this.playerStateHandler = function () {
         if (playerSelector.state == 1) {
@@ -163,6 +165,7 @@ var App = function () {
                 }
             }
         }.bind(this));
+        ticTacToe.aiInit();
     };
     this.resetAppHandler = function () {
         $("#reset").click(function () {
@@ -181,6 +184,7 @@ var App = function () {
     };
     this.resetApp = function () {
         ticTacToe.resetGrid();
+        ticTacToe.resetCellStates();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
@@ -201,18 +205,25 @@ var Game = function () {
             "background-size": '70%'
         }, {
             "background": 'rgba(0,0,0,0) center no-repeat',
-            "background-size": '70%'
+            "background-size": '30%'
         }
     ];
 
+    //an array with all the cell objects
     this.$cells = [];
-
 
     //current active player, 0 is player 1 and 1 is player 2 or ai
     this.currentPlayerState = 0;
 
     //to check if player is playing against ai or another player
     this.aiActiveState = 0;
+
+    this.aiInit = function () {
+        if (player2Selector.state == 0) {
+            this.aiActiveState = 1;
+            log(this.aiActiveState)
+        }
+    };
 
     this.init = function () {
         this.initCells();
@@ -232,6 +243,12 @@ var Game = function () {
             this.$cells[i].$id.css(this.cellCssSettings[2]);
         }
     };
+    //resetting cell states for new game
+    this.resetCellStates = function(){
+        for (var i = 0; i < 9; i++) {
+            this.$cells[i].state = 0;
+        }
+    };
 
 };
 
@@ -239,26 +256,29 @@ var Cell = function (id, scope) {
 
     this.state = 0;
     this.$id = $("#cell-" + id);
+    //current value to change from x and o so later we can compare for who won
+    this.currentValue = "";
 
-    this.clickHandler = function(){
+    this.clickHandler = function () {
         var self = this;
-        this.$id.click(function(){
-            $(this).css(scope.cellCssSettings[scope.currentPlayerState]);
-            self.state = 1;
-            log(self.$id + " state: " + self.state);
-            self.playerChangeHandler();
+        this.$id.click(function () {
+            if (self.state == 0) {
+                $(this).css(scope.cellCssSettings[scope.currentPlayerState]);
+                self.state = 1;
+                log(self.$id + " state: " + self.state);
+                self.playerChangeHandler();
+            }
         });
     };
 
-    this.playerChangeHandler = function(){
-        if (scope.currentPlayerState == 0){
+    this.playerChangeHandler = function () {
+        if (scope.currentPlayerState == 0) {
             scope.currentPlayerState = 1;
-        }else if (scope.currentPlayerState == 1){
+        } else if (scope.currentPlayerState == 1) {
             scope.currentPlayerState = 0;
         }
     };
 };
-
 
 
 var ticTacToe = new Game();
