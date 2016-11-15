@@ -3,9 +3,10 @@
  */
 $(document).ready(function () {
 
-    ticTacToe.initSelectors();
-    ticTacToe.selectorStatesHandler();
-    ticTacToe.initGame();
+    app.initSelectors();
+    app.selectorStatesHandler();
+    app.initGame();
+    ticTacToe.init();
 });
 
 var xSelector, oSelector, playerSelector, player2Selector, confirmSelector;
@@ -40,7 +41,7 @@ function log() {
 }
 
 
-var selector = function (id, type, subType, cssSettings) {
+var Selector = function (id, type, subType, cssSettings) {
     this.$id = $(id);
     this.type = type;
     this.subType = subType;
@@ -72,7 +73,7 @@ var selector = function (id, type, subType, cssSettings) {
     this.init();
 };
 
-var app = function () {
+var App = function () {
     this.selectorTypes = ["peg", "player", "confirm"];
     this.selectorSubTypes = ["x", "o", "player", "player2", "confirm"];
     this.selectorCssSettings = [
@@ -84,11 +85,26 @@ var app = function () {
             margin: "0 10px"
         }
     ];
+    this.cellCssSettings = [{
+        "background": 'url(' + oImgUrl + ') center no-repeat',
+        "background-size": '70%'
+    },{
+        "background": 'url(' + xImgUrl + ') center no-repeat',
+        "background-size": '70%'
+    },{
+        "background": 'rgba(0,0,0,0) center no-repeat',
+        "background-size": '70%'
+    }];
+
+    //array is later filled with jquery selector objects
+    this.$cells = [];
 
     this.cellClickBinder = function () {
-        for (var i = 1; i < 10; i++) {
-            $("#cell-" + i).click(function () {
-                $(this).css("background-image", 'url(' + xImgUrl + ')');
+        var self = this;
+        for (var i = 0; i < 9; i++) {
+            this.$cells.push($("#cell-" + i));
+            this.$cells[i].click(function () {
+                $(this).css(self.cellCssSettings[xSelector.state]);
             });
         }
     };
@@ -99,11 +115,11 @@ var app = function () {
         this.resetAppHandler();
     };
     this.initSelectors = function () {
-        xSelector = new selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
-        oSelector = new selector("#o-selector", this.selectorTypes[0], this.selectorSubTypes[1], this.selectorCssSettings);
-        playerSelector = new selector("#player-selector", this.selectorTypes[1], this.selectorSubTypes[2], this.selectorCssSettings);
-        player2Selector = new selector("#player2-selector", this.selectorTypes[1], this.selectorSubTypes[3], this.selectorCssSettings);
-        confirmSelector = new selector("#confirm", this.selectorTypes[2], this.selectorSubTypes[4]);
+        xSelector = new Selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
+        oSelector = new Selector("#o-selector", this.selectorTypes[0], this.selectorSubTypes[1], this.selectorCssSettings);
+        playerSelector = new Selector("#player-selector", this.selectorTypes[1], this.selectorSubTypes[2], this.selectorCssSettings);
+        player2Selector = new Selector("#player2-selector", this.selectorTypes[1], this.selectorSubTypes[3], this.selectorCssSettings);
+        confirmSelector = new Selector("#confirm", this.selectorTypes[2], this.selectorSubTypes[4]);
     };
 
     this.renderAllSelectors = function () {
@@ -117,32 +133,24 @@ var app = function () {
     this.playerStateHandler = function () {
         if (playerSelector.state == 1) {
             player2Selector.state = 0;
-        } else if (playerSelector.state == 0) {
-            player2Selector.state = 1;
         }
         this.renderAllSelectors();
     };
     this.player2StateHandler = function () {
         if (player2Selector.state == 1) {
             playerSelector.state = 0;
-        } else if (player2Selector.state == 0) {
-            playerSelector.state = 1;
         }
         this.renderAllSelectors();
     };
     this.xStateHandler = function () {
         if (xSelector.state == 1) {
             oSelector.state = 0;
-        } else if (xSelector.state == 0) {
-            oSelector.state = 1;
         }
         this.renderAllSelectors();
     };
     this.oStateHandler = function () {
         if (oSelector.state == 1) {
             xSelector.state = 0;
-        } else if (oSelector.state == 0) {
-            xSelector.state = 1;
         }
         this.renderAllSelectors();
     };
@@ -184,6 +192,11 @@ var app = function () {
         }.bind(this));
     };
 
+    this.resetGrid = function(){
+        for (var i = 0; i < this.$cells.length; i++) {
+            this.$cells[i].css(this.cellCssSettings[2]);
+        }
+    };
     this.resetSelectorStates = function () {
         confirmSelector.state = 0;
         xSelector.state = 0;
@@ -192,9 +205,19 @@ var app = function () {
         player2Selector.state = 0;
     };
     this.resetApp = function () {
+        this.resetGrid();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
 };
 
-var ticTacToe = new app();
+var app = new App();
+
+var Game = function(){
+
+    this.init = function(){
+    };
+
+};
+
+var ticTacToe = new Game();
