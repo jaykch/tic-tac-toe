@@ -16,28 +16,39 @@
         @import url('https://fonts.googleapis.com/css?family=Lato');
 
         * {
-            font-family: 'Lato', sans-serif;
             -webkit-transition: all 0.7s ease;
             -moz-transition: all 0.7s ease;
             -ms-transition: all 0.7s ease;
             -o-transition: all 0.7s ease;
             transition: all 0.7s ease;
+            overflow: hidden;
+            font-family: 'Lato', sans-serif;
+        }
+
+        body {
+            background: rgb(255, 174, 39);
+            background: -moz-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #009688), color-stop(100%, #607D8B));
+            background: -webkit-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -o-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -ms-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: linear-gradient(135deg, #009688 0%, #607D8B 100%);
         }
 
         .app {
+            background: rgb(255, 174, 39);
+            background: -moz-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #009688), color-stop(100%, #607D8B));
+            background: -webkit-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -o-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: -ms-linear-gradient(-45deg, #009688 0%, #607D8B 100%);
+            background: linear-gradient(135deg, #009688 0%, #607D8B 100%);
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
             align-items: center;
             height: 100vh;
             width: 100vw;
-            background: rgb(255, 174, 39);
-            background: -moz-linear-gradient(-45deg, rgba(255, 174, 39, 1) 0%, rgba(222, 73, 109, 1) 100%);
-            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, rgba(255, 174, 39, 1)), color-stop(100%, rgba(222, 73, 109, 1)));
-            background: -webkit-linear-gradient(-45deg, rgba(255, 174, 39, 1) 0%, rgba(222, 73, 109, 1) 100%);
-            background: -o-linear-gradient(-45deg, rgba(255, 174, 39, 1) 0%, rgba(222, 73, 109, 1) 100%);
-            background: -ms-linear-gradient(-45deg, rgba(255, 174, 39, 1) 0%, rgba(222, 73, 109, 1) 100%);
-            background: linear-gradient(135deg, rgba(255, 174, 39, 1) 0%, rgba(222, 73, 109, 1) 100%);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffae27', endColorstr='#de496d', GradientType=1);
         }
 
@@ -59,16 +70,141 @@
             text-decoration: none;
         }
 
+        .grid-cell {
+            width: 15vh;
+            height: 15vh;
+            border: 1px black solid;
+        }
+
+        .grid {
+            display: flex;
+            flex-flow: column nowrap;
+        }
+
+        .grid-block {
+            display: flex;
+            flex-flow: row nowrap;
+        }
+
+        .score > span {
+            font-size: 20px;
+            margin: 0 20px;
+        }
+
+        .score {
+            margin: 20px;
+        }
+
+        .btn {
+            width: 100px;
+        }
+
+        .selectors-container {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.67);
+            position: absolute;
+            height: 40vh;
+        }
+
+        .selectors {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selectors * {
+            color: white;
+        }
+
+        .selectors a {
+            min-width: 100px;
+            border: 1px white solid;
+            min-height: 3vh;
+            display: block;
+            font-size: x-large;
+            margin: 0 10px;
+        }
+
+        .selectors a:hover{
+            color: white;
+            opacity: 0.5;
+            cursor: pointer;
+            margin: 0 20px;
+        }
+
+        .selector{
+            display: flex;
+            flex-flow: column nowrap;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .selector .buttons{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .btn{
+            margin: 0 50px;
+        }
+
     </style>
 </head>
 <body>
 <div class="app">
-    <div>
+    <div class="selectors-container">
+        <div class="selectors">
+            <div class="player selector">
+                <h3>Select Players</h3>
+                <div class="buttons">
+                    <a id="player-selector">1 Player</a>
+                    <a id="ai-selector">2 Players</a>
+                </div>
+            </div>
+            <div class="peg selector">
+                <h3>Select Peg</h3>
+                <div class="buttons">
+                    <a id="x-selector">X</a>
+                    <a id="o-selector">O</a>
+                </div>
+            </div>
+        </div>
 
+    </div>
+    <div class="controls">
+        <button id="start" class="btn btn-primary">Start</button>
+        <button id="reset" class="btn btn-danger">Reset</button>
+    </div>
+    <div class="score text-center">
+        <h2>Score</h2>
+        <span id="player1-score">Player: 0</span>
+        <span id="player2-score">AI: 0</span>
+    </div>
+    <div class="grid ">
+        <div class="grid-block">
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+        </div>
+        <div class="grid-block">
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+        </div>
+        <div class="grid-block">
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+            <div class="grid-cell"></div>
+        </div>
     </div>
     <div class="row">
         <footer class="text-center">
-            <a href="https://github.com/jaykch/pomodoro-clock" target="_blank">GitHub Link</a>
+            <a href="https://github.com/jaykch/tic-tac-toe" target="_blank">GitHub Link</a>
         </footer>
     </div>
 </div>
