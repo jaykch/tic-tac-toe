@@ -5,10 +5,9 @@ $(document).ready(function () {
 
     ticTacToe.initSelectors();
     ticTacToe.selectorStatesHandler();
-
 });
 
-var xSelector, oSelector, playerSelector, player2Selector;
+var xSelector, oSelector, playerSelector, player2Selector, confirmSelector;
 
 function log() {
     console.log(arguments);
@@ -32,7 +31,6 @@ var selector = function (id, type, subType, cssSettings) {
             else {
                 this.state = 0;
             }
-            this.render();
         }.bind(this));
     };
     this.render = function () {
@@ -60,12 +58,12 @@ var app = function () {
             margin: "0 10px"
         }
     ];
-
     this.initSelectors = function () {
         xSelector = new selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
         oSelector = new selector("#o-selector", this.selectorTypes[0], this.selectorSubTypes[1], this.selectorCssSettings);
         playerSelector = new selector("#player-selector", this.selectorTypes[1], this.selectorSubTypes[2], this.selectorCssSettings);
         player2Selector = new selector("#player2-selector", this.selectorTypes[1], this.selectorSubTypes[3], this.selectorCssSettings);
+        confirmSelector = new selector("#confirm", this.selectorTypes[2], this.selectorSubTypes[4]);
     };
 
     this.renderAll = function () {
@@ -108,6 +106,22 @@ var app = function () {
         this.renderAll();
     };
 
+    this.confirmHandler = function(){
+        confirmSelector.$id.click(function(){
+            if (confirmSelector.state == 1){
+                if(playerSelector.state == 0 && player2Selector.state ==0){
+                    alert("Please select if you want to play against a computer or a friend");
+                    confirmSelector.state = 0;
+                }else if(xSelector.state == 0 && oSelector.state ==0){
+                    alert("Please select if Player 1 is X or O");
+                    confirmSelector.state = 0;
+                }else{
+                    $("#selectors-container").css("display", "none");
+                }
+            }
+        }.bind(this));
+    };
+
     this.selectorStatesHandler = function () {
         playerSelector.$id.click(function () {
             this.playerStateHandler();
@@ -121,6 +135,8 @@ var app = function () {
         oSelector.$id.click(function () {
             this.oStateHandler();
         }.bind(this));
+
+        this.confirmHandler();
     };
 };
 
