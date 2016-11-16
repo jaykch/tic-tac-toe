@@ -6,7 +6,6 @@ $(document).ready(function () {
     app.initSelectors();
     app.selectorStatesHandler();
     app.initGame();
-    ticTacToe.init();
 });
 
 var xSelector, oSelector, playerSelector, player2Selector, confirmSelector, player, player2;
@@ -92,6 +91,7 @@ var App = function () {
     this.initGame = function () {
         this.$selectorsContainer = $("#selectors-container");
         this.resetAppHandler();
+        this.startHandler();
     };
     this.initSelectors = function () {
         xSelector = new Selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
@@ -107,11 +107,13 @@ var App = function () {
         xSelector.render();
         oSelector.render();
     };
-    this.renderGame = function () {
-        $("#player1-score").html(player.type + ": " + ticTacToe.playerScore);
-        $("#player2-score").html(player2.type + ": " + ticTacToe.player2Score);
-    };
 
+    //todo: fix start handler so start needs to be pressed every time reset is pressed
+    this.startHandler = function () {
+        $("#start").click(function () {
+            ticTacToe.init();
+        });
+    };
     this.playerStateHandler = function () {
         if (playerSelector.state == 1) {
             player2Selector.state = 0;
@@ -162,19 +164,20 @@ var App = function () {
                     alert("Please select if Player 1 is X or O");
                     confirmSelector.state = 0;
                 } else {
-                    this.$selectorsContainer.css("display", "none");
+                    ticTacToe.hideScreen("selectors");
                 }
             }
-            ticTacToe.playersInit();
-            this.renderGame();
+            ticTacToe.initPlayers();
+            ticTacToe.renderGame();
         }.bind(this));
     };
     this.resetAppHandler = function () {
         $("#reset").click(function () {
             this.resetApp();
-            this.$selectorsContainer.css("display", "block");
+            ticTacToe.showScreen("selectors");
         }.bind(this));
     };
+
     this.resetSelectorStates = function () {
         confirmSelector.state = 0;
         xSelector.state = 0;
@@ -189,8 +192,6 @@ var App = function () {
         this.renderAllSelectors();
     };
 };
-
-var app = new App();
 
 var Game = function () {
 
@@ -213,7 +214,6 @@ var Game = function () {
             "background-size": '30%'
         }
     ];
-
     this.drawTimoutSettings = [900, 1800, 2700];
 
     //an array with all the cell objects
@@ -226,7 +226,13 @@ var Game = function () {
     //to check if player is playing against ai or another player
     this.aiActiveState = 0;
 
-    this.playersInit = function () {
+    this.init = function () {
+        this.$drawScreen = $("#draw");
+        this.$winScreen = $("#win");
+        this.initCells();
+    };
+    this.initPlayers = function () {
+        player = new Player("Player");
         if (player2Selector.state == 0) {
             this.aiActiveState = 1;
             player2 = "";
@@ -236,6 +242,10 @@ var Game = function () {
             player2 = "";
             player2 = new Player("Player2");
         }
+        this.initPlayerPegs();
+    };
+
+    this.initPlayerPegs = function () {
         if (xSelector.state == 1) {
             player.peg = "x";
             player2.peg = "o";
@@ -243,14 +253,14 @@ var Game = function () {
             player.peg = "o";
             player2.peg = "x";
         }
-
     };
 
-    this.init = function () {
-        player = new Player("Player");
-        this.drawScreen = $("#draw");
-        this.initCells();
+    this.renderGame = function () {
+        $("#player1-score").html(player.type + ": " + ticTacToe.playerScore);
+        $("#player2-score").html(player2.type + ": " + ticTacToe.player2Score);
     };
+
+
     this.initCells = function () {
         var self = this;
         for (var i = 0; i < 9; i++) {
@@ -274,7 +284,7 @@ var Game = function () {
     this.drawHandler = function () {
         var timeOutReset;
         var timeOutAnimation;
-        var timeOutDrawScreen;
+        var timeOut$drawScreen;
         if (this.unfilledCells.length == 0) {
             timeOutAnimation = setTimeout(function () {
                 for (var i = 0; i < this.$cells.length; i++) {
@@ -282,15 +292,43 @@ var Game = function () {
                 }
                 clearTimeout(timeOutAnimation);
             }.bind(this), this.drawTimoutSettings[0]);
-            timeOutDrawScreen = setTimeout(function () {
-                this.drawScreen.css("display", "block");
-                clearTimeout(timeOutDrawScreen);
+            timeOut$drawScreen = setTimeout(function () {
+                this.showScreen("draw");
+                clearTimeout(timeOut$drawScreen);
             }.bind(this), this.drawTimoutSettings[1]);
             timeOutReset = setTimeout(function () {
-                this.drawScreen.css("display", "none");
+                this.hideScreen("draw");
                 this.reset();
                 clearTimeout(timeOutReset);
             }.bind(this), this.drawTimoutSettings[2]);
+        }
+    };
+
+    this.showScreen = function (type) {
+        switch (type) {
+            case "draw":
+                this.$drawScreen.css("display", "block");
+                break;
+            case "win":
+                this.$winScreen.css("display", "block");
+                break;
+            case "selectors":
+                app.$selectorsContainer.css("display", "block");
+                break;
+        }
+    };
+
+    this.hideScreen = function (type) {
+        switch (type) {
+            case "draw":
+                this.$drawScreen.css("display", "none");
+                break;
+            case "win":
+                this.$winScreen.css("display", "none");
+                break;
+            case "selectors":
+                app.$selectorsContainer.css("display", "none");
+                break;
         }
     };
 
@@ -350,13 +388,24 @@ var Cell = function (id, scope) {
     this.clickHandler = function () {
         var self = this;
         this.$id.click(function () {
-            if (self.state == 0) {
-                $(this).css(self.pegHandler());
-                self.state = 1;
-                self.currentValueHandler();
-                self.playerChangeHandler();
-                self.unfilledCellsHandler();
+            if (scope.aiActiveState == 1) {
+                if (self.state == 0 && scope.currentPlayerState == 0) {
+                    $(this).css(self.pegHandler());
+                    self.state = 1;
+                    self.currentValueHandler();
+                    self.playerChangeHandler();
+                    self.unfilledCellsHandler();
+                }
+            } else if (scope.aiActiveState == 0) {
+                if (self.state == 0) {
+                    $(this).css(self.pegHandler());
+                    self.state = 1;
+                    self.currentValueHandler();
+                    self.playerChangeHandler();
+                    self.unfilledCellsHandler();
+                }
             }
+
             scope.drawHandler();
             scope.aiTurnHandler();
         });
@@ -410,5 +459,6 @@ var Ai = function () {
     }
 };
 
-var ai = new Ai();
+var app = new App();
 var ticTacToe = new Game();
+var ai = new Ai();
