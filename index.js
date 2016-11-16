@@ -188,6 +188,7 @@ var App = function () {
     this.resetApp = function () {
         ticTacToe.reset();
         ticTacToe.resetScore();
+        ticTacToe.resetCells();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
@@ -244,7 +245,6 @@ var Game = function () {
         }
         this.initPlayerPegs();
     };
-
     this.initPlayerPegs = function () {
         if (xSelector.state == 1) {
             player.peg = "x";
@@ -254,13 +254,6 @@ var Game = function () {
             player2.peg = "x";
         }
     };
-
-    this.renderGame = function () {
-        $("#player1-score").html(player.type + ": " + ticTacToe.playerScore);
-        $("#player2-score").html(player2.type + ": " + ticTacToe.player2Score);
-    };
-
-
     this.initCells = function () {
         var self = this;
         for (var i = 0; i < 9; i++) {
@@ -268,6 +261,11 @@ var Game = function () {
             this.unfilledCells = this.$cells;
             this.$cells[i].clickHandler();
         }
+    };
+
+    this.renderGame = function () {
+        $("#player1-score").html(player.type + ": " + ticTacToe.playerScore);
+        $("#player2-score").html(player2.type + ": " + ticTacToe.player2Score);
     };
 
     this.aiTurnHandler = function () {
@@ -317,7 +315,6 @@ var Game = function () {
                 break;
         }
     };
-
     this.hideScreen = function (type) {
         switch (type) {
             case "draw":
@@ -330,6 +327,28 @@ var Game = function () {
                 app.$selectorsContainer.css("display", "none");
                 break;
         }
+    };
+
+    //array to configure what blocks to check on terminal
+    this.gridCellsToCheck = [[0,3,6],[1,4,7],[2,5,8],[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]];
+
+    this.checkTerminal = function () {
+        var sum = "";
+        //for loop to check all the states that can be the same
+        for (var i = 0; i < this.gridCellsToCheck.length; i++) {
+            for (var j = 0; j < this.gridCellsToCheck[i].length; j++) {
+                sum += this.$cells[this.gridCellsToCheck[i][j]].currentValue;
+            }
+            log(sum);
+            if (sum == "ooo" || sum == "xxx"){
+                this.showScreen("win");
+            }
+            sum = "";
+        }
+        /*if ((this.$cells[0].currentValue + this.$cells[3].currentValue + this.$cells[6].currentValue) == "xxx") {
+            log("win");
+            this.showScreen("win");
+        }*/
     };
 
     //reset everything except for score for new game
@@ -351,6 +370,10 @@ var Game = function () {
             this.$cells[i].currentValue = "";
         }
     };
+    //todo: use reset cells to unbind click events so every time game is reset start button needs to be pressed
+    this.resetCells = function () {
+    };
+
     this.resetGameStates = function () {
         this.currentPlayerState = 0;
         this.unfilledCells = this.$cells;
@@ -405,7 +428,8 @@ var Cell = function (id, scope) {
                     self.unfilledCellsHandler();
                 }
             }
-
+            log("checking terminal");
+            scope.checkTerminal();
             scope.drawHandler();
             scope.aiTurnHandler();
         });
