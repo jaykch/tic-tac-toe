@@ -214,7 +214,7 @@ var Game = function () {
         }
     ];
 
-    this.drawTimoutSettings = [500,1700,2700];
+    this.drawTimoutSettings = [900, 1800, 2700];
 
     //an array with all the cell objects
     this.$cells = [];
@@ -260,33 +260,13 @@ var Game = function () {
         }
     };
 
-    //reset everything except for score for new game
-    this.reset = function () {
-        this.resetGrid();
-        this.resetCellStates();
-        this.resetGameStates();
-    };
-    //reset the whole grid to blank
-    this.resetGrid = function () {
-        for (var i = 0; i < this.$cells.length; i++) {
-            this.$cells[i].$id.css(this.cellCssSettings[2]);
-        }
-    };
-    //resetting cell states for new game
-    this.resetCellStates = function () {
-        for (var i = 0; i < 9; i++) {
-            this.$cells[i].state = 0;
-            this.$cells[i].currentValue = "";
-        }
-    };
-    this.resetGameStates = function () {
-        this.currentPlayerState = 0;
-        this.aiActiveState = 0;
-        this.unfilledCells = this.$cells;
-    };
-    this.resetScore = function () {
-        this.playerScore = 0;
-        this.player2Score = 0;
+    this.aiTurnHandler = function () {
+        setTimeout(function () {
+            if (this.currentPlayerState == 1) {
+                ai.turn(this);
+                this.currentPlayerState = 0;
+            }
+        }.bind(this), 1000);
     };
     this.drawHandler = function () {
         var timeOutReset;
@@ -309,6 +289,35 @@ var Game = function () {
                 clearTimeout(timeOutReset);
             }.bind(this), this.drawTimoutSettings[2]);
         }
+    };
+
+    //reset everything except for score for new game
+    this.reset = function () {
+        this.resetGrid();
+        this.resetCellStates();
+        this.resetGameStates();
+    };
+    //reset the whole grid to blank
+    this.resetGrid = function () {
+        for (var i = 0; i < this.$cells.length; i++) {
+            this.$cells[i].$id.css(this.cellCssSettings[2]);
+        }
+    };
+    //resetting cell states for new game
+    this.resetCellStates = function () {
+        for (var i = 0; i < 9; i++) {
+            this.$cells[i].state = 0;
+            this.$cells[i].currentValue = "";
+        }
+    };
+    this.resetGameStates = function () {
+        this.currentPlayerState = 0;
+        this.unfilledCells = this.$cells;
+    };
+    this.resetScore = function () {
+        this.aiActiveState = 0;
+        this.playerScore = 0;
+        this.player2Score = 0;
     };
 };
 
@@ -346,6 +355,7 @@ var Cell = function (id, scope) {
                 self.unfilledCellsHandler();
             }
             scope.drawHandler();
+            scope.aiTurnHandler();
         });
     };
     this.currentValueHandler = function () {
@@ -380,5 +390,20 @@ var Player = function (type) {
     this.type = type;
 };
 
+var Ai = function () {
 
+    this.turn = function (gameScope) {
+        var index = Math.floor(Math.random() * gameScope.unfilledCells.length);
+        if (gameScope.unfilledCells.length > 0) {
+            gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[1]);
+            gameScope.unfilledCells[index].state = 1;
+            gameScope.unfilledCells = gameScope.unfilledCells.filter(function (val) {
+                return val.id !== gameScope.unfilledCells[index].id;
+            }.bind(this));
+            log(gameScope.unfilledCells);
+        }
+    }
+};
+
+var ai = new Ai();
 var ticTacToe = new Game();
