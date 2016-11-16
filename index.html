@@ -108,11 +108,27 @@
             width: 100px;
         }
 
-        .selectors-container {
+        .selectors-container, #draw {
             width: 100%;
             background: rgba(0, 0, 0, 0.67);
             position: absolute;
             height: 50vh;
+        }
+
+        #draw {
+            display: none;
+        }
+
+        #draw > div{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+
+        #draw h1{
+            margin: auto;
+            color: white;
         }
 
         .selectors {
@@ -137,7 +153,7 @@
             margin: 0 10px;
         }
 
-        .selectors a:hover{
+        .selectors a:hover {
             color: white;
             opacity: 0.5;
             cursor: pointer;
@@ -145,25 +161,25 @@
 
         }
 
-        .selector{
+        .selector {
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
             align-items: center;
         }
 
-        .selector .buttons{
+        .selector .buttons {
             display: flex;
             justify-content: center;
             align-items: center;
             text-align: center;
         }
 
-        .btn{
+        .btn {
             margin: 0 20px;
         }
 
-        #confirm{
+        #confirm {
             margin: 20px;
             text-align: center;
             border: 3px green solid;
@@ -218,6 +234,11 @@
             <div id="cell-6" class="grid-cell"></div>
             <div id="cell-7" class="grid-cell"></div>
             <div id="cell-8" class="grid-cell"></div>
+        </div>
+    </div>
+    <div id="draw">
+        <div>
+            <h1>DRAW!</h1>
         </div>
     </div>
     <div class="row">

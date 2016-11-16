@@ -209,6 +209,8 @@ var Game = function () {
         }, {
             "background": 'rgba(0,0,0,0) center no-repeat',
             "background-size": '30%'
+        }, {
+            "background-size": '30%'
         }
     ];
 
@@ -244,6 +246,7 @@ var Game = function () {
 
     this.init = function () {
         player = new Player("Player");
+        this.drawScreen = $("#draw");
         this.initCells();
     };
     this.initCells = function () {
@@ -282,13 +285,26 @@ var Game = function () {
     this.resetScore = function () {
         this.playerScore = 0;
         this.player2Score = 0;
-    }
-    this.updateScore = function () {
-        var timeOut;
+    };
+    this.drawHandler = function () {
+        var timeOutReset;
+        var timeOutAnimation;
+        var timeOutDrawScreen;
         if (this.unfilledCells.length == 0) {
-             timeOut = setTimeout(function () {
+            timeOutAnimation = setTimeout(function () {
+                for (var i = 0; i < this.$cells.length; i++) {
+                    this.$cells[i].$id.css(this.cellCssSettings[3]);
+                }
+                clearTimeout(timeOutAnimation);
+            }.bind(this), 1000);
+            timeOutDrawScreen = setTimeout(function () {
+                this.drawScreen.css("display", "block");
+                clearTimeout(timeOutDrawScreen);
+            }.bind(this), 2000);
+            timeOutReset = setTimeout(function () {
+                this.drawScreen.css("display", "none");
                 this.reset();
-                 clearTimeout(timeOut);
+                clearTimeout(timeOutReset);
             }.bind(this), 3000);
         }
     };
@@ -327,7 +343,7 @@ var Cell = function (id, scope) {
                 self.playerChangeHandler();
                 self.unfilledCellsHandler();
             }
-            scope.updateScore();
+            scope.drawHandler();
         });
     };
     this.currentValueHandler = function () {
