@@ -380,10 +380,10 @@ var Game = function () {
     this.updateScore = function (winType) {
         if ((winType == "ooo" && player.peg == "o") || (winType == "xxx" && player.peg == "x")) {
             this.playerScore += 1;
-            this.$winner.html(player.type + "Wins!");
+            this.$winner.html(player.type + " Wins!");
         } else {
             this.player2Score += 1;
-            this.$winner.html(player2.type + "Wins!");
+            this.$winner.html(player2.type + " Wins!");
         }
         this.renderGame();
     };
