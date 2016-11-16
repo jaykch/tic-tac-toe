@@ -261,12 +261,15 @@ var Game = function () {
     };
 
     this.aiTurnHandler = function () {
-        setTimeout(function () {
-            if (this.currentPlayerState == 1) {
-                ai.turn(this);
-                this.currentPlayerState = 0;
-            }
-        }.bind(this), 1000);
+        //check if ai is active
+        if (this.aiActiveState == 1) {
+            setTimeout(function () {
+                if (this.currentPlayerState == 1) {
+                    ai.turn(this);
+                    this.currentPlayerState = 0;
+                }
+            }.bind(this), 1000);
+        }
     };
     this.drawHandler = function () {
         var timeOutReset;
@@ -392,15 +395,17 @@ var Player = function (type) {
 
 var Ai = function () {
 
+    //basic turn function that randomises ai turn
     this.turn = function (gameScope) {
         var index = Math.floor(Math.random() * gameScope.unfilledCells.length);
         if (gameScope.unfilledCells.length > 0) {
-            gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[1]);
+            if (player2.peg == "x") {
+                gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[1]);
+            } else gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[0]);
             gameScope.unfilledCells[index].state = 1;
             gameScope.unfilledCells = gameScope.unfilledCells.filter(function (val) {
                 return val.id !== gameScope.unfilledCells[index].id;
             }.bind(this));
-            log(gameScope.unfilledCells);
         }
     }
 };

@@ -109,25 +109,29 @@
             width: 100px;
         }
 
-        .selectors-container, #draw {
+        .selectors-container, #draw, #win {
             width: 100%;
             background: rgba(0, 0, 0, 0.67);
             position: absolute;
             height: 50vh;
         }
 
-        #draw {
+        #draw{
             display: none;
         }
 
-        #draw > div{
+        #win{
+            display: block;
+        }
+
+        #draw > div, #win > div{
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100%;
         }
 
-        #draw h1{
+        #draw h1, #win > h1{
             margin: auto;
             color: white;
         }
@@ -240,6 +244,11 @@
     <div id="draw">
         <div>
             <h1>DRAW!</h1>
+        </div>
+    </div>
+    <div id="win">
+        <div>
+            <h1 id="winner">Winner!</h1>
         </div>
     </div>
     <div class="row">
