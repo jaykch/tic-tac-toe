@@ -10,6 +10,7 @@ $(document).ready(function () {
 
 var xSelector, oSelector, playerSelector, player2Selector, confirmSelector, player, player2;
 
+//base 64 images for icons, change them accordingly to use anything instead of x and o
 var xImgUrl = "data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pgo8IS0tIE" +
     "dlbmVyYXRvcjogQWRvYmUgSWxsdXN0cmF0b3IgMTYuMC4wLCBTVkcgRXhwb3J0IFBsdWctSW4gLiBTVkcgVmVyc2lvbjogNi4wMCBCdWlsZ" +
     "CAwKSAgLS0+CjwhRE9DVFlQRSBzdmcgUFVCTElDICItLy9XM0MvL0RURCBTVkcgMS4xLy9FTiIgImh0dHA6Ly93d3cudzMub3JnL0dyYXBo" +
@@ -335,7 +336,9 @@ var Game = function () {
     this.gridCellsToCheck = [[0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [2, 4, 6]];
 
     this.onWin = function () {
-
+        //to avoid drawing the draw screen push an element to unfilled cells so its not empty(draw runs when
+        //there are no more unfilled cells
+        this.unfilledCells.push(1);
         //stop ai from playing
         this.aiActiveState = 0;
 
@@ -352,6 +355,7 @@ var Game = function () {
             clearTimeout(winTimeoutReset);
         }.bind(this), this.winTimoutSettings[2]);
     };
+    //check if any of the grids has a winning combination
     this.checkTerminal = function () {
         var sum = "";
         //for loop to check all the states that can be the same
