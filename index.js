@@ -216,10 +216,12 @@ var Game = function () {
         }
     ];
     this.drawTimoutSettings = [900, 1800, 2700];
+    this.winTimoutSettings = [900, 1800, 2700];
 
     //an array with all the cell objects
     this.$cells = [];
     this.unfilledCells = [];
+    this.losingCells = [];
 
     //current active player, 0 is player 1 and 1 is player 2 or ai
     this.currentPlayerState = 0;
@@ -330,8 +332,26 @@ var Game = function () {
     };
 
     //array to configure what blocks to check on terminal
-    this.gridCellsToCheck = [[0,3,6],[1,4,7],[2,5,8],[0,1,2],[3,4,5],[6,7,8],[0,4,8],[2,4,6]];
+    this.gridCellsToCheck = [[0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [2, 4, 6]];
 
+    this.onWin = function (winner) {
+
+        //stop ai from playing
+        this.aiActiveState = 0;
+
+        var winTimeoutReset;
+        var winTimeout$winScreen;
+
+        winTimeout$winScreen = setTimeout(function () {
+            this.showScreen("win");
+            clearTimeout(winTimeout$winScreen);
+        }.bind(this), this.winTimoutSettings[1]);
+        winTimeoutReset = setTimeout(function () {
+            this.hideScreen("win");
+            this.reset();
+            clearTimeout(winTimeoutReset);
+        }.bind(this), this.winTimoutSettings[2]);
+    };
     this.checkTerminal = function () {
         var sum = "";
         //for loop to check all the states that can be the same
@@ -339,17 +359,22 @@ var Game = function () {
             for (var j = 0; j < this.gridCellsToCheck[i].length; j++) {
                 sum += this.$cells[this.gridCellsToCheck[i][j]].currentValue;
             }
-            log(sum);
-            if (sum == "ooo" || sum == "xxx"){
-                this.showScreen("win");
+            if (sum == "ooo" || sum == "xxx") {
+                for (var k = 0; k < 9; k++) {
+                    this.$cells[k].$id.css("background-size", "30%")
+                }
+                for (var l = 0; l < this.gridCellsToCheck[i].length; l++) {
+                    this.$cells[this.gridCellsToCheck[i][l]].$id.css("background-size", "80%")
+                }
+                log("win detected");
+                this.onWin();
+                return true;
             }
             sum = "";
         }
-        /*if ((this.$cells[0].currentValue + this.$cells[3].currentValue + this.$cells[6].currentValue) == "xxx") {
-            log("win");
-            this.showScreen("win");
-        }*/
     };
+
+    //todo: update scores
 
     //reset everything except for score for new game
     this.reset = function () {
@@ -428,7 +453,6 @@ var Cell = function (id, scope) {
                     self.unfilledCellsHandler();
                 }
             }
-            log("checking terminal");
             scope.checkTerminal();
             scope.drawHandler();
             scope.aiTurnHandler();
