@@ -179,8 +179,6 @@ var App = function () {
             this.$selectorsContainer.css("display", "block");
         }.bind(this));
     };
-
-
     this.resetSelectorStates = function () {
         confirmSelector.state = 0;
         xSelector.state = 0;
@@ -221,6 +219,7 @@ var Game = function () {
 
     //an array with all the cell objects
     this.$cells = [];
+    this.unfilledCells = [];
 
     //current active player, 0 is player 1 and 1 is player 2 or ai
     this.currentPlayerState = 0;
@@ -238,10 +237,10 @@ var Game = function () {
             player2 = "";
             player2 = new Player("player2");
         }
-        if (xSelector.state == 1){
+        if (xSelector.state == 1) {
             player.peg = "x";
             player2.peg = "o";
-        }else if(oSelector.state == 1){
+        } else if (oSelector.state == 1) {
             player.peg = "o";
             player2.peg = "x";
         }
@@ -252,11 +251,11 @@ var Game = function () {
         player = new Player("player");
         this.initCells();
     };
-
     this.initCells = function () {
         var self = this;
         for (var i = 0; i < 9; i++) {
             this.$cells.push(new Cell(i, self));
+            this.unfilledCells.push(new Cell(i, self));
             this.$cells[i].clickHandler();
         }
     };
@@ -271,10 +270,10 @@ var Game = function () {
     this.resetCellStates = function () {
         for (var i = 0; i < 9; i++) {
             this.$cells[i].state = 0;
+            this.$cells[i].currentValue = "";
         }
     };
-
-    this.resetGameStates = function(){
+    this.resetGameStates = function () {
         this.playerScore = 0;
         this.player2Score = 0;
         this.currentPlayerState = 0;
@@ -287,6 +286,7 @@ var Cell = function (id, scope) {
 
     this.state = 0;
     this.$id = $("#cell-" + id);
+    this.id = id;
     //current value to change from x and o so later we can compare for who won
     this.currentValue = "";
 
@@ -295,13 +295,13 @@ var Cell = function (id, scope) {
         var x = scope.cellCssSettings[1];
         var o = scope.cellCssSettings[0];
 
-        if(ticTacToe.currentPlayerState == 1 && xSelector.state == 1){
+        if (scope.currentPlayerState == 1 && xSelector.state == 1) {
             return o;
-        }else if(ticTacToe.currentPlayerState == 1 && oSelector.state == 1){
+        } else if (scope.currentPlayerState == 1 && oSelector.state == 1) {
             return x;
-        }else if(ticTacToe.currentPlayerState == 0 && xSelector.state == 1){
+        } else if (scope.currentPlayerState == 0 && xSelector.state == 1) {
             return x;
-        }else if(ticTacToe.currentPlayerState == 0 && oSelector.state == 1){
+        } else if (scope.currentPlayerState == 0 && oSelector.state == 1) {
             return o;
         }
     };
@@ -313,16 +313,28 @@ var Cell = function (id, scope) {
                 self.state = 1;
                 self.currentValueHandler();
                 self.playerChangeHandler();
+                self.unfilledCellsHandler();
             }
-
         });
     };
     this.currentValueHandler = function () {
-        if (scope.currentPlayerState == 0) {
+        if (scope.currentPlayerState == 1 && xSelector.state == 1) {
             this.currentValue = "o";
-        } else this.currentValue = "x";
+        } else if (scope.currentPlayerState == 1 && oSelector.state == 1) {
+            this.currentValue = "x";
+        } else if (scope.currentPlayerState == 0 && xSelector.state == 1) {
+            this.currentValue = "x";
+        } else if (scope.currentPlayerState == 0 && oSelector.state == 1) {
+            this.currentValue = "o";
+        }
     };
-
+    this.unfilledCellsHandler = function () {
+        if (this.state == 1) {
+            scope.unfilledCells = scope.unfilledCells.filter(function (val) {
+                return val.id !== this.id;
+            }.bind(this));
+        }
+    };
     this.playerChangeHandler = function () {
         if (scope.currentPlayerState == 0) {
             scope.currentPlayerState = 1;
