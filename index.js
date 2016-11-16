@@ -36,11 +36,6 @@ var oImgUrl = "data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZG
     "z4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8Zz4KPC9nPgo8" +
     "Zz4KPC9nPgo8Zz4KPC9nPgo8L3N2Zz4K";
 
-function log() {
-    console.log(arguments);
-}
-
-
 var Selector = function (id, type, subType, cssSettings) {
     this.$id = $(id);
     this.type = type;
@@ -86,13 +81,13 @@ var App = function () {
         }
     ];
 
-
     //array is later filled with jquery selector objects
 
     this.initGame = function () {
         this.$selectorsContainer = $("#selectors-container");
         this.resetAppHandler();
         this.startHandler();
+        this.resetStates();
     };
     this.initSelectors = function () {
         xSelector = new Selector("#x-selector", this.selectorTypes[0], this.selectorSubTypes[0], this.selectorCssSettings);
@@ -176,6 +171,10 @@ var App = function () {
             this.resetApp();
             ticTacToe.showScreen("selectors");
         }.bind(this));
+    };
+    this.resetStates = function(){
+        var name = "<h3>Built By <a href='http://www.jaykch.com/' target='_blank'>Jay Kumar<a> </h3>";
+        $("#grid-handle").html(name);
     };
 
     this.resetSelectorStates = function () {

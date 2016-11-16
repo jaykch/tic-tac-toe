@@ -33,23 +33,25 @@
         }
 
         body {
-            background: rgb(255, 174, 39);
-            background: -moz-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #940096), color-stop(100%, #1f0096));
-            background: -webkit-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -o-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -ms-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: linear-gradient(135deg, #940096 0%, #1f0096 100%);
+            background: rgb(255,174,39);
+            background: -moz-linear-gradient(-45deg, rgba(255,174,39,1) 0%, rgba(222,73,109,1) 100%);
+            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(255,174,39,1)), color-stop(100%,rgba(222,73,109,1)));
+            background: -webkit-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: -o-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: -ms-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: linear-gradient(135deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffae27', endColorstr='#de496d',GradientType=1 );
         }
 
         .app {
-            background: rgb(255, 174, 39);
-            background: -moz-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%, #940096), color-stop(100%, #1f0096));
-            background: -webkit-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -o-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: -ms-linear-gradient(-45deg, #940096 0%, #1f0096 100%);
-            background: linear-gradient(135deg, #940096 0%, #1f0096 100%);
+            background: rgb(255,174,39);
+            background: -moz-linear-gradient(-45deg, rgba(255,174,39,1) 0%, rgba(222,73,109,1) 100%);
+            background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(255,174,39,1)), color-stop(100%,rgba(222,73,109,1)));
+            background: -webkit-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: -o-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: -ms-linear-gradient(-45deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            background: linear-gradient(135deg, rgba(255,174,39,1) 0%,rgba(222,73,109,1) 100%);
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffae27', endColorstr='#de496d',GradientType=1 );
             display: flex;
             flex-flow: column nowrap;
             justify-content: center;
@@ -236,6 +238,7 @@
             <div id="cell-7" class="grid-cell"></div>
             <div id="cell-8" class="grid-cell"></div>
         </div>
+        <div id="grid-handle" class="text-center"></div>
     </div>
     <div id="draw">
         <div>
