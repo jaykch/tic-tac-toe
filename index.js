@@ -214,6 +214,8 @@ var Game = function () {
         }
     ];
 
+    this.drawTimoutSettings = [500,1700,2700];
+
     //an array with all the cell objects
     this.$cells = [];
     this.unfilledCells = [];
@@ -296,16 +298,16 @@ var Game = function () {
                     this.$cells[i].$id.css(this.cellCssSettings[3]);
                 }
                 clearTimeout(timeOutAnimation);
-            }.bind(this), 1000);
+            }.bind(this), this.drawTimoutSettings[0]);
             timeOutDrawScreen = setTimeout(function () {
                 this.drawScreen.css("display", "block");
                 clearTimeout(timeOutDrawScreen);
-            }.bind(this), 2000);
+            }.bind(this), this.drawTimoutSettings[1]);
             timeOutReset = setTimeout(function () {
                 this.drawScreen.css("display", "none");
                 this.reset();
                 clearTimeout(timeOutReset);
-            }.bind(this), 3000);
+            }.bind(this), this.drawTimoutSettings[2]);
         }
     };
 };
