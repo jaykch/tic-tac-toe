@@ -108,7 +108,6 @@ var App = function () {
         oSelector.render();
     };
 
-    //todo: fix start handler so start needs to be pressed every time reset is pressed
     this.startHandler = function () {
         $("#start").click(function () {
             ticTacToe.init();
@@ -216,7 +215,7 @@ var Game = function () {
         }
     ];
     this.drawTimoutSettings = [900, 1800, 2700];
-    this.winTimoutSettings = [900, 1800, 2700];
+    this.winTimoutSettings = [900, 900, 2700];
 
     //an array with all the cell objects
     this.$cells = [];
@@ -232,6 +231,7 @@ var Game = function () {
     this.init = function () {
         this.$drawScreen = $("#draw");
         this.$winScreen = $("#win");
+        this.$winner = $("#winner");
         this.initCells();
     };
     this.initPlayers = function () {
@@ -334,7 +334,7 @@ var Game = function () {
     //array to configure what blocks to check on terminal
     this.gridCellsToCheck = [[0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 4, 8], [2, 4, 6]];
 
-    this.onWin = function (winner) {
+    this.onWin = function () {
 
         //stop ai from playing
         this.aiActiveState = 0;
@@ -366,15 +366,24 @@ var Game = function () {
                 for (var l = 0; l < this.gridCellsToCheck[i].length; l++) {
                     this.$cells[this.gridCellsToCheck[i][l]].$id.css("background-size", "80%")
                 }
-                log("win detected");
                 this.onWin();
+                this.updateScore(sum);
                 return true;
             }
             sum = "";
         }
     };
 
-    //todo: update scores
+    this.updateScore = function (winType) {
+        if ((winType == "ooo" && player.peg == "o") || (winType == "xxx" && player.peg == "x")) {
+            this.playerScore += 1;
+            this.$winner.html("Winner is: " + player.type);
+        } else {
+            this.player2Score += 1;
+            this.$winner.html("Winner is: " + player2.type);
+        }
+        this.renderGame();
+    };
 
     //reset everything except for score for new game
     this.reset = function () {
@@ -398,7 +407,6 @@ var Game = function () {
     //todo: use reset cells to unbind click events so every time game is reset start button needs to be pressed
     this.resetCells = function () {
     };
-
     this.resetGameStates = function () {
         this.currentPlayerState = 0;
         this.unfilledCells = this.$cells;
@@ -453,6 +461,9 @@ var Cell = function (id, scope) {
                     self.unfilledCellsHandler();
                 }
             }
+            if (player2Selector.state == 0) {
+                scope.aiActiveState = 1;
+            }
             scope.checkTerminal();
             scope.drawHandler();
             scope.aiTurnHandler();
@@ -498,12 +509,18 @@ var Ai = function () {
         if (gameScope.unfilledCells.length > 0) {
             if (player2.peg == "x") {
                 gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[1]);
-            } else gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[0]);
+                gameScope.unfilledCells[index].currentValue = "x";
+            } else {
+                gameScope.unfilledCells[index].$id.css(gameScope.cellCssSettings[0]);
+                gameScope.unfilledCells[index].currentValue = "o";
+            }
             gameScope.unfilledCells[index].state = 1;
             gameScope.unfilledCells = gameScope.unfilledCells.filter(function (val) {
                 return val.id !== gameScope.unfilledCells[index].id;
             }.bind(this));
+
         }
+        gameScope.checkTerminal();
     }
 };
 
