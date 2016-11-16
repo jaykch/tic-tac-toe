@@ -108,12 +108,8 @@ var App = function () {
         oSelector.render();
     };
     this.renderGame = function () {
-        if (ticTacToe.aiActiveState == 0) {
-            $("#player2-score").html("Player2: " + ticTacToe.player2Score);
-        }
-        if (ticTacToe.aiActiveState == 1) {
-            $("#player2-score").html("AI: " + ticTacToe.player2Score);
-        }
+        $("#player1-score").html(player.type + ": " + ticTacToe.playerScore);
+        $("#player2-score").html(player2.type + ": " + ticTacToe.player2Score);
     };
 
     this.playerStateHandler = function () {
@@ -187,9 +183,8 @@ var App = function () {
         player2Selector.state = 0;
     };
     this.resetApp = function () {
-        ticTacToe.resetGrid();
-        ticTacToe.resetCellStates();
-        ticTacToe.resetGameStates();
+        ticTacToe.reset();
+        ticTacToe.resetScore();
         this.resetSelectorStates();
         this.renderAllSelectors();
     };
@@ -231,11 +226,11 @@ var Game = function () {
         if (player2Selector.state == 0) {
             this.aiActiveState = 1;
             player2 = "";
-            player2 = new Player("ai");
+            player2 = new Player("AI");
         } else if (player2Selector.state == 1) {
             this.aiActiveState = 0;
             player2 = "";
-            player2 = new Player("player2");
+            player2 = new Player("Player2");
         }
         if (xSelector.state == 1) {
             player.peg = "x";
@@ -248,18 +243,24 @@ var Game = function () {
     };
 
     this.init = function () {
-        player = new Player("player");
+        player = new Player("Player");
         this.initCells();
     };
     this.initCells = function () {
         var self = this;
         for (var i = 0; i < 9; i++) {
             this.$cells.push(new Cell(i, self));
-            this.unfilledCells.push(new Cell(i, self));
+            this.unfilledCells = this.$cells;
             this.$cells[i].clickHandler();
         }
     };
 
+    //reset everything except for score for new game
+    this.reset = function () {
+        this.resetGrid();
+        this.resetCellStates();
+        this.resetGameStates();
+    };
     //reset the whole grid to blank
     this.resetGrid = function () {
         for (var i = 0; i < this.$cells.length; i++) {
@@ -274,12 +275,23 @@ var Game = function () {
         }
     };
     this.resetGameStates = function () {
-        this.playerScore = 0;
-        this.player2Score = 0;
         this.currentPlayerState = 0;
         this.aiActiveState = 0;
+        this.unfilledCells = this.$cells;
     };
-
+    this.resetScore = function () {
+        this.playerScore = 0;
+        this.player2Score = 0;
+    }
+    this.updateScore = function () {
+        var timeOut;
+        if (this.unfilledCells.length == 0) {
+             timeOut = setTimeout(function () {
+                this.reset();
+                 clearTimeout(timeOut);
+            }.bind(this), 3000);
+        }
+    };
 };
 
 var Cell = function (id, scope) {
@@ -315,6 +327,7 @@ var Cell = function (id, scope) {
                 self.playerChangeHandler();
                 self.unfilledCellsHandler();
             }
+            scope.updateScore();
         });
     };
     this.currentValueHandler = function () {
